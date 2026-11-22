@@ -1,14 +1,16 @@
-22 Kasım 2026 — ENS491 demo doğrulaması
+ENS491 demo — English interface and three selectable locations
 
-TypeScript: geçti.
-ESLint: geçti.
-Node durum/içerik testleri: 4/4 geçti.
-Playwright (Chrome): 4/4 geçti. Mobil 390x844, masaüstü 1440x1000.
-Expo Doctor: 20/20 geçti.
-Expo export: web, Android ve iOS paketleri başarıyla üretildi. Bu işlem cihazda çalışma testi değildir.
+TypeScript: passed.
+ESLint: passed.
+State/content tests: 5/5 passed.
+Playwright browser tests: 4/4 passed (Chrome, mobile and desktop sizes).
 
-Sınanan akışlar: durak dışında → bahçe, üç anlatım, yalnız detaylıda görsel, IC/gölet taslak ekranı, kaynaklar, sıfırlama, olay kaydı, sesin seviye/konum değişiminde kesilmesi, Türkçe ses yokken açıklama.
+Verified: garden story, all four chapters, short/medium/detailed content,
+level-specific images, sources, activity log, reset, and three location buttons.
+IC and Lake show “Story coming soon” and hide the previous story and audio control.
+Narration tests verify English voice selection, cancellation on a selection change,
+and a useful error when no English voice is available.
 
-Ses etkileşim testi kontrollü tarayıcı API taklidi ile yapıldı. Fiziksel iPhone/Android üzerinde Expo Go açılışı, gerçek Türkçe TTS ve ses seviyesi henüz sınanmadı.
-GPS/sensör ölçümü ve otomatik bilişsel yük çıkarımı kapsam dışı; manuel demo.
-Yağız reposunun referans kopyasında git status temiz; commit/push yapılmadı.
+Speech tests use a controlled browser API mock. Audible playback and Expo Go launch
+on physical phones still require device testing. GPS, sensors and automatic load
+estimation are not implemented; selection remains manual.

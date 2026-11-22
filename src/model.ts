@@ -4,7 +4,7 @@ export type StopId = 'tosun' | 'ic' | 'lake';
 export type Selection = StopId | 'outside';
 export const LEVELS: Level[] = ['short', 'medium', 'detailed'];
 export const levelLabels: Record<Level, string> = {
-  short: 'Sade', medium: 'Orta', detailed: 'Detaylı',
+  short: 'Short', medium: 'Medium', detailed: 'Detailed',
 };
 
 export interface Source { title: string; url: string }

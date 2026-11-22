@@ -10,9 +10,9 @@ import { demoReducer, getActiveStory, INITIAL_STATE, LEVELS, levelLabels, type L
 const stops = data as Stop[];
 const green = '#244F3E';
 const figures = {
-  founder: { source: require('./assets/tosun-terzioglu.jpg'), ratio: 636 / 420, title: 'Bir bilim insanı, bir eğitimci', description: 'Tosun Terzioğlu, Sabancı Üniversitesi kürsüsünde konuşurken.', credit: 'Arşiv fotoğrafı: Sabancı Üniversitesi / gazeteSU' },
-  nature: { source: require('./assets/tosun-doga.jpg'), ratio: 636 / 423, title: 'Kampüsle kurduğu yakınlık', description: 'Kampüste kürekle görülen Tosun Hoca. Bu fotoğraf, anlatıdaki doğa ve peyzaj ilgisine eşlik ediyor.', credit: 'Arşiv fotoğrafı: Sabancı Üniversitesi / gazeteSU · Çekim tarihi belirtilmemiştir.' },
-  garden: { source: require('./assets/tosun-bahce.jpg'), ratio: 4 / 3, title: 'Hatıranın yaşadığı bahçe', description: 'Tosun Terzioğlu Bahçesi’nde su, doğal taşlar ve bitkilerin buluştuğu alan.', credit: 'Fotoğraf: Sabancı Üniversitesi · Yaşayan Bir Kampüs' },
+  founder: { source: require('./assets/tosun-terzioglu.jpg'), ratio: 636 / 420, title: 'A scientist and an educator', description: 'Tosun Terzioğlu speaking at a Sabancı University lectern.', credit: 'Archive photograph: Sabancı University / gazeteSU' },
+  nature: { source: require('./assets/tosun-doga.jpg'), ratio: 636 / 423, title: 'A close connection with campus', description: 'Tosun Hoca on campus with a shovel, accompanying the story of his interest in nature and landscaping.', credit: 'Archive photograph: Sabancı University / gazeteSU · Date not specified.' },
+  garden: { source: require('./assets/tosun-bahce.jpg'), ratio: 4 / 3, title: 'A garden that keeps a memory alive', description: 'Water, natural stone and plants come together in Tosun Terzioğlu Garden.', credit: 'Photograph: Sabancı University · A Living Campus' },
 };
 const serif = Platform.select({ ios: 'Georgia', android: 'serif', default: 'Georgia' });
 
@@ -32,7 +32,7 @@ function Screen() {
   const [speaking, setSpeaking] = useState(false);
   const [audioError, setAudioError] = useState('');
   const [sourcesOpen, setSourcesOpen] = useState(false);
-  const [events, setEvents] = useState<string[]>(['Demo başladı · Konum seçimi bekleniyor']);
+  const [events, setEvents] = useState<string[]>(['Demo started · Choose a location']);
   const [logOpen, setLogOpen] = useState(false);
   const speechRun = useRef(0);
   const story = getActiveStory(stops, state);
@@ -46,7 +46,7 @@ function Screen() {
   async function stopSpeech() {
     speechRun.current += 1;
     setSpeaking(false);
-    try { await Speech.stop(); } catch { setAudioError('Ses durdurulamadı. Sayfayı yenileyebilirsiniz.'); }
+    try { await Speech.stop(); } catch { setAudioError('Could not stop narration. Try reloading the page.'); }
   }
   useEffect(() => {
     const subscription = AppState.addEventListener('change', (status) => {
@@ -68,16 +68,16 @@ function Screen() {
     setAudioError('');
     setSourcesOpen(false);
     dispatch({ type: 'location', value });
-    log(`Konum: ${value === 'outside' ? 'Durak dışında' : stops.find((item) => item.id === value)?.name}`);
+    log(`Location: ${value === 'outside' ? 'Outside the stops' : stops.find((item) => item.id === value)?.name}`);
   }
   function selectLevel(value: Level) {
     void stopSpeech();
     setAudioError('');
     dispatch({ type: 'level', value });
-    log(`Anlatım: ${levelLabels[value]}`);
+    log(`Detail level: ${levelLabels[value]}`);
   }
   async function toggleSpeech() {
-    if (speaking) { await stopSpeech(); log('Ses durduruldu'); return; }
+    if (speaking) { await stopSpeech(); log('Narration stopped'); return; }
     if (!story) return;
     const run = ++speechRun.current;
     setAudioError('');
@@ -92,85 +92,85 @@ function Screen() {
         );
       });
       if (run !== speechRun.current) return;
-      const voice = voices.find((v) => v.language.toLowerCase().startsWith('tr'));
+      const voice = voices.find((v) => v.language.toLowerCase().startsWith('en'));
       if (!voice) {
         setSpeaking(false);
-        setAudioError('Türkçe ses bulunamadı. Cihazınıza Türkçe bir konuşma sesi ekleyin veya metni okuyarak devam edin.');
-        log('Türkçe ses bulunamadı');
+        setAudioError('No English voice was found. Add an English speech voice to your device, or continue reading.');
+        log('No English voice found');
         return;
       }
       const finish = () => { if (run === speechRun.current) setSpeaking(false); };
       Speech.speak(`${story.stop.title}. ${story.text}`, {
-        language: 'tr-TR', voice: voice.identifier, rate: 0.92,
+        language: voice.language, voice: voice.identifier, rate: 0.92,
         onDone: finish, onStopped: finish,
         onError: () => {
           if (run !== speechRun.current) return;
           finish();
-          setAudioError('Sesli okuma başlatılamadı. Cihazın ses ayarlarını kontrol edin.');
+          setAudioError('Could not start narration. Check your device’s audio settings.');
         },
       });
-      log(`Sesli okuma: ${levelLabels[state.level]}`);
+      log(`Narration: ${levelLabels[state.level]}`);
     } catch {
       if (run !== speechRun.current) return;
       setSpeaking(false);
-      setAudioError('Sesli okuma bu cihazda kullanılamıyor. Metni okuyarak devam edebilirsiniz.');
+      setAudioError('Narration is unavailable on this device. You can continue reading the story.');
     }
   }
   function reset() {
     void stopSpeech();
     dispatch({ type: 'reset' });
     setAudioError(''); setSourcesOpen(false); setLogOpen(false);
-    setEvents(['Demo sıfırlandı · Konum seçimi bekleniyor']);
+    setEvents(['Demo reset · Choose a location']);
   }
   async function openSource(url: string) {
     try { await Linking.openURL(url); }
-    catch { setAudioError('Kaynak açılamadı. İnternet bağlantısını kontrol edin.'); }
+    catch { setAudioError('Could not open the source. Check your internet connection.'); }
   }
 
   return <SafeAreaView style={s.safe}>
     <StatusBar style="dark" />
     <ScrollView contentContainerStyle={s.page}>
       <View style={s.header}>
-        <View style={s.brand}><Text style={s.brandIcon}>K.</Text><View><Text style={s.brandTitle}>KAMPÜSÜN HİKÂYELERİ</Text><Text style={s.small}>Sabancı Üniversitesi · ENS491</Text></View></View>
+        <View style={s.brand}><Text style={s.brandIcon}>C.</Text><View><Text style={s.brandTitle}>CAMPUS STORIES</Text><Text style={s.small}>Sabancı University · ENS491</Text></View></View>
         <View style={s.badge}><Text style={s.badgeText}>DEMO 01</Text></View>
       </View>
 
       <View style={s.intro}>
-        <Text style={s.eyebrow}>TOSUN TERZİOĞLU BAHÇESİ</Text>
-        <Text accessibilityRole="header" style={s.title}>Bir insan.{ '\n' }Yaşayan bir hatıra.</Text>
-        <Text style={s.introText}>Bahçedeki ismin ardındaki insanı tanı. Bilimden üniversiteye, kampüsün ağaçlarından bu bahçeye uzanan dört bölümlük hikâye.</Text>
+        <Text style={s.eyebrow}>TOSUN TERZİOĞLU GARDEN</Text>
+        <Text accessibilityRole="header" style={s.title}>One person.{ '\n' }A living memory.</Text>
+        <Text style={s.introText}>Meet the person behind the garden’s name. Follow four chapters connecting science, university life, campus trees and a place of remembrance.</Text>
       </View>
 
       <View style={s.controls}>
-        <View style={s.sectionHeading}><Text style={s.sectionTitle}>01  Bahçeye giriş</Text><Text style={s.manual}>ELLE SEÇİM</Text></View>
-        <Text style={s.helper}>GPS yerine bu düğmeler kullanılıyor.</Text>
+        <View style={s.sectionHeading}><Text style={s.sectionTitle}>01  Choose a location</Text><Text style={s.manual}>MANUAL</Text></View>
+        <Text style={s.helper}>Select a stop manually instead of using GPS.</Text>
         <View style={s.locationGrid}>
-          {stops.filter((stop) => stop.id === 'tosun').map((stop, index) => <Pressable key={stop.id} testID={`location-${stop.id}`} accessibilityRole="button"
+          {stops.map((stop, index) => <Pressable key={stop.id} testID={`location-${stop.id}`} accessibilityRole="button"
             accessibilityLabel={stop.name} accessibilityState={{ selected: state.location === stop.id }}
             onPress={() => selectLocation(stop.id)} style={({ pressed }) => [s.location, state.location === stop.id && s.locationSelected, pressed && s.pressed]}>
-            <View style={s.locationTop}><Text style={s.locationNumber}>0{index + 1}</Text><Text style={[s.status, stop.active && s.statusActive]}>{stop.active ? 'HAZIR' : 'YAKINDA'}</Text></View>
+            <View style={s.locationTop}><Text style={s.locationNumber}>0{index + 1}</Text><Text style={[s.status, stop.active && s.statusActive]}>{stop.active ? 'READY' : 'COMING SOON'}</Text></View>
             <Text style={s.locationName}>{stop.name}</Text>
-            <Text style={s.locationSub}>{stop.active ? 'Bilgi Merkezi yanı' : stop.id === 'ic' ? 'Bina önündeki açık alan' : 'Gölet kıyısındaki dış alan'}</Text>
-            {state.location === stop.id && <Text style={s.selectedText}>✓ Seçili konum</Text>}
+            <Text style={s.locationSub}>{stop.active ? 'Beside the Information Center' : stop.id === 'ic' ? 'Outside the Information Center' : 'Outdoors by the lake'}</Text>
+            {state.location === stop.id && <Text style={s.selectedText}>✓ Selected location</Text>}
           </Pressable>)}
         </View>
         <Pressable testID="location-outside" accessibilityRole="button" accessibilityState={{ selected: state.location === 'outside' }} onPress={() => selectLocation('outside')} style={s.outsideButton}>
-          <Text style={s.outsideText}>{state.location === 'outside' ? '●' : '○'}  Şu an durak dışındayım</Text>
+          <Text style={s.outsideText}>{state.location === 'outside' ? '●' : '○'}  I am outside the stops</Text>
         </Pressable>
         <View style={s.separator} />
-        <View style={s.sectionHeading}><Text style={s.sectionTitle}>02  Anlatımı seç</Text><Text style={s.manual}>ELLE SEÇİM</Text></View>
+        <View style={s.sectionHeading}><Text style={s.sectionTitle}>02  Choose story detail</Text><Text style={s.manual}>MANUAL</Text></View>
         <View style={s.choices}>{LEVELS.map((level) => <Choice key={level} label={levelLabels[level]} selected={state.level === level} onPress={() => selectLevel(level)} id={`level-${level}`} />)}</View>
-        <Text style={s.helper}>Bu seçim içerik ayrıntısını değiştirir; bilişsel yük ölçümü yapılmaz.</Text>
+        <Text style={s.helper}>This changes story detail. It does not measure cognitive load.</Text>
       </View>
 
       {story ? <View testID="story-card" style={s.story}>
-        <View style={s.sectionHeading}><Text style={s.eyebrow}>TOSUN TERZİOĞLU BAHÇESİ</Text><Text testID="story-level" style={s.pill}>{levelLabels[state.level]}</Text></View>
+        <View style={s.sectionHeading}><Text style={s.eyebrow}>TOSUN TERZİOĞLU GARDEN</Text><Text testID="story-level" style={s.pill}>{levelLabels[state.level]}</Text></View>
         <Text accessibilityRole="header" style={s.storyTitle}>{story.stop.title}</Text>
-        <Text style={s.storyMeta}>{words} kelime · Yaklaşık {seconds} sn sesli anlatım</Text>
-        <Pressable testID="speech-toggle" accessibilityRole="button" accessibilityLabel={speaking ? 'Sesli okumayı durdur' : 'Hikâyeyi dinle'} onPress={() => void toggleSpeech()} style={({ pressed }) => [s.listen, pressed && s.pressed]}>
-          <Text style={s.listenText}>{speaking ? '■  Okumayı durdur' : '▶  Hikâyeyi dinle'}</Text><Text style={s.listenLanguage}>TR</Text>
+        <Text style={s.storyMeta}>{words} words · About {seconds} sec narration</Text>
+        <Pressable testID="speech-toggle" accessibilityRole="button" accessibilityLabel={speaking ? 'Stop narration' : 'Listen to the story'} onPress={() => void toggleSpeech()} style={({ pressed }) => [s.listen, pressed && s.pressed]}>
+          <Text style={s.listenText}>{speaking ? '■  Stop narration' : '▶  Listen to the story'}</Text><Text style={s.listenLanguage}>EN</Text>
         </Pressable>
-        <Text style={s.audioHint}>iPhone’da dinlemek için sessiz modu kapatın.</Text>
+        <Text style={s.audioHint}>On iPhone, turn off silent mode to hear narration.</Text>
         {audioError !== '' && <Text accessibilityRole="alert" testID="audio-error" style={s.error}>{audioError}</Text>}
         <View testID="story-text">
           {story.stop.chapters?.map((chapter, chapterIndex) => <View key={chapter.id} testID={`chapter-${chapter.id}`} style={s.chapter}>
@@ -183,11 +183,11 @@ function Screen() {
           </View>)}
         </View>
         {state.level === 'detailed' && <View testID="visual-timeline" style={s.timeline}>
-          <Text style={s.timelineHeading}>Hikâyenin üç izi</Text>
+          <Text style={s.timelineHeading}>Three moments in the story</Text>
           {[
-            ['1997', 'Bir üniversitenin başlangıcı', 'Kurucu rektörlük görevini üstlendi.'],
-            ['1999', 'Yeşeren bir kampüs', 'Peyzaj çalışmalarına yakından ilgi gösterdi.'],
-            ['2017', 'Yaşayan bir hatıra', 'Anısına Tosun Terzioğlu Bahçesi oluşturuldu.'],
+            ['1997', 'A university takes shape', 'He became the founding rector.'],
+            ['1999', 'A greener campus', 'He took a close interest in landscaping.'],
+            ['2017', 'A living memory', 'Tosun Terzioğlu Garden was created in his memory.'],
           ].map(([year, title, description], index) => <View key={year} style={s.timelineRow}>
             <View style={s.timelineTrack}>
               <View style={s.timelineDot}><Text style={s.timelineNumber}>0{index + 1}</Text></View>
@@ -196,25 +196,25 @@ function Screen() {
             <View style={s.timelineContent}><Text style={s.timelineYear}>{year}</Text><Text style={s.timelineTitle}>{title}</Text><Text style={s.timelineDescription}>{description}</Text></View>
           </View>)}
         </View>}
-        <Pressable testID="sources-toggle" accessibilityRole="button" accessibilityState={{ expanded: sourcesOpen }} onPress={() => setSourcesOpen(!sourcesOpen)} style={s.sourceToggle}><Text style={s.sourceToggleText}>{sourcesOpen ? '−' : '+'}  Hikâyenin kaynakları</Text></Pressable>
+        <Pressable testID="sources-toggle" accessibilityRole="button" accessibilityState={{ expanded: sourcesOpen }} onPress={() => setSourcesOpen(!sourcesOpen)} style={s.sourceToggle}><Text style={s.sourceToggleText}>{sourcesOpen ? '−' : '+'}  Story sources</Text></Pressable>
         {sourcesOpen && <View testID="sources" style={s.sourceList}>
-          <Text style={s.helper}>Biyografi ve anma yazılarındaki bilgiler yeniden anlatıldı. Ziyaretçiye yöneltilen sorular ve bölüm geçişleri bu hikâye için yazıldı; kişiye ait söz veya yaşanmış anı olarak sunulmaz.</Text>
+          <Text style={s.helper}>Based on biographical and memorial sources. Questions and transitions were written for this story; they are not presented as his own words or as witnessed memories.</Text>
           {story.stop.sources.map((source, index) => <Pressable accessibilityRole="link" key={source.url} onPress={() => void openSource(source.url)} style={s.sourceLink}><Text style={s.sourceLinkText}>{index + 1}. {source.title} ↗</Text></Pressable>)}
         </View>}
       </View> : <View testID="empty-state" style={s.empty}>
         <Text style={s.emptyIcon}>{state.location === 'outside' ? '◎' : '◌'}</Text>
-        <Text style={s.emptyTitle}>{state.location === 'outside' ? 'Hikâye bir durakla başlar.' : `${selectedStop?.name}`}</Text>
-        <Text style={s.emptyBody}>{state.location === 'outside' ? 'Denemeye başlamak için yukarıdan Tosun Terzioğlu Bahçesi’ni seç.' : 'Bu durağın üç anlatım metni proje dosyalarında hazır. İlk demoda bahçe hikâyesini deneyebilirsin.'}</Text>
-        <Pressable accessibilityRole="button" onPress={() => selectLocation('tosun')} style={s.start}><Text style={s.listenText}>Bahçe hikâyesini aç →</Text></Pressable>
+        <Text style={s.emptyTitle}>{state.location === 'outside' ? 'Every story starts somewhere.' : `${selectedStop?.name}`}</Text>
+        <Text style={s.emptyBody}>{state.location === 'outside' ? 'Choose a location above. The Tosun Terzioğlu Garden story is ready to explore.' : 'Story coming soon. We are preparing the story for this location. For now, explore Tosun Terzioğlu Garden.'}</Text>
+        <Pressable accessibilityRole="button" onPress={() => selectLocation('tosun')} style={s.start}><Text style={s.listenText}>Explore the garden story →</Text></Pressable>
       </View>}
 
       <View style={s.footer}>
         <View style={s.footerRow}>
-          <Pressable accessibilityRole="button" testID="log-toggle" onPress={() => setLogOpen(!logOpen)} style={s.footerButton}><Text style={s.footerLink}>{logOpen ? 'İşlem kaydını kapat' : 'İşlem kaydını göster'}</Text></Pressable>
-          <Pressable accessibilityRole="button" testID="reset" onPress={reset} style={s.footerButton}><Text style={s.footerLink}>Demoyu sıfırla ↺</Text></Pressable>
+          <Pressable accessibilityRole="button" testID="log-toggle" onPress={() => setLogOpen(!logOpen)} style={s.footerButton}><Text style={s.footerLink}>{logOpen ? 'Hide activity log' : 'Show activity log'}</Text></Pressable>
+          <Pressable accessibilityRole="button" testID="reset" onPress={reset} style={s.footerButton}><Text style={s.footerLink}>Reset demo ↺</Text></Pressable>
         </View>
         {logOpen && <View testID="event-log" style={s.log}>{events.map((event, index) => <Text style={s.logText} key={`${event}-${index}`}>{event}</Text>)}</View>}
-        <Text style={s.footerNote}>Konum ve anlatım seçimi manuel · Sensör bağlantısı yok</Text>
+        <Text style={s.footerNote}>Manual location and detail selection · No sensors connected</Text>
       </View>
     </ScrollView>
   </SafeAreaView>;

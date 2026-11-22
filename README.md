@@ -1,25 +1,40 @@
-# ENS491 Demo — Tosun Terzioğlu Bahçesi
+# ENS491 Demo — Campus Stories
 
-Sabancı Üniversitesi ENS491 projesi için Expo / React Native hikâye anlatımı demosu.
-Tosun Terzioğlu’nun hayatını, üniversitenin kuruluşundaki rolünü, doğaya ilgisini
-ve anısına oluşturulan bahçeyi dört bölümde anlatır.
+An Expo / React Native storytelling demo for Sabancı University’s ENS491 project.
+Select one of three campus locations and choose how much story detail to see.
 
-## Özellikler
+## Locations
 
-- **Manuel konum:** Bahçedeyim / durak dışındayım.
-- **Üç anlatım seviyesi:** Sade, orta, detaylı. Dört bölümün sırası korunur.
-- **Görseller:** Sade anlatım görselsizdir; orta seviyede bahçe fotoğrafı,
-  detaylı seviyede üç fotoğraf ve zaman çizelgesi bulunur.
-- **Türkçe sesli okuma:** Cihazın metinden konuşma özelliğiyle tüm hikâye okunur.
-  Seviye veya konum değiştiğinde ses durur.
-- **Kaynaklar:** Biyografi, üniversite yayınları ve anma konuşmalarına bağlantılar.
+| Location | Current experience |
+| --- | --- |
+| Tosun Terzioğlu Garden | Four-chapter story, three detail levels, photographs and narration |
+| Information Center · IC | Selectable; **Story coming soon** |
+| Lake · Sports Center | Selectable; **Story coming soon** |
 
-Bu sürümde GPS, sensör verisi veya otomatik bilişsel yük ölçümü kullanılmaz.
-IC ve gölet taslakları veri dosyasında korunur; uygulama yalnız bahçeyi gösterir.
+Location selection is manual. This version does not use GPS, sensor data or
+automatic cognitive-load estimation. Selecting a different location stops narration
+and removes the previous story. “Outside the stops” clears the active story.
 
-## Kurulum
+## Story and visuals
 
-Node 24 LTS önerilir; `.nvmrc` dosyası bulunur.
+The garden story follows four chapters:
+
+1. **The person behind the name:** a mathematician, academic and science administrator.
+2. **What kind of university did he imagine?** Founding a university, listening and academic freedom.
+3. **Knowing a campus through its trees:** plants, landscaping and campus walks.
+4. **Why a garden?** Its location, opening, design and meaning as a memorial.
+
+The interface, story, captions and narration are in English. The chapter order stays
+the same at every level. **Short** has no illustrations; **Medium** includes a garden
+photograph; **Detailed** includes three photographs and a visual timeline.
+
+Narration uses an English voice installed on the device. Changing the detail level
+or location stops it. The app shows a helpful message if no English voice is available.
+On iPhone, turn off silent mode to hear the audio.
+
+## Run
+
+Node 24 LTS is recommended; the repository includes `.nvmrc`.
 
 ```sh
 git clone https://github.com/EfeHanKeles346/ENS491-demo.git
@@ -28,63 +43,46 @@ npm ci
 npm start
 ```
 
-SDK 58 destekleyen Expo Go ile terminaldeki QR kodunu açın. Telefon ve bilgisayar
-aynı Wi-Fi ağında olmalıdır. Expo Go hesap girişi isterse CLI ve telefonda aynı
-hesabı kullanın. Bir SDK uyumsuzluğu mesajı alırsanız Expo Go sürümünü kontrol edin.
+Open the QR code in an SDK 58-compatible version of Expo Go. Keep the phone and
+computer on the same Wi-Fi network. If Expo Go requests sign-in, use the same
+account in the CLI and the phone app. Check the installed SDK if there is a mismatch.
 
-Web önizleme:
+For a browser preview:
 
 ```sh
 npm run web
 ```
 
-Mac’te `Baslat.command` da kullanılabilir. Varsayılan Node sürümünüz uyumsuzsa:
+On macOS, `Baslat.command` also starts the development server. If your default
+Node version is incompatible, run:
 
 ```sh
 npm exec --yes --package=node@24 -- npm start
 ```
 
-Sesli okuma için cihazda Türkçe konuşma sesi bulunmalıdır. iPhone’da sessiz modu
-kapatın. Türkçe ses yoksa uygulama açıklama gösterir; metin okunmaya devam edilebilir.
+## Files
 
-## Hikâye
+- `App.tsx`: location selection, English interface and narration.
+- `src/content.json`: three locations, narrative levels, chapters and sources.
+- `src/StoryFigure.tsx`: photographs with captions and attribution.
+- `src/model.ts`: manual selection state and detail-level validation.
+- `docs/Tosun_Hoca_Hikayesi.html`: the current English garden story; download and open in a browser.
+- `docs/Hikaye_Metinleri.html`: English text drafts for all three locations; IC and lake drafts are not displayed in the app yet.
+- `tests/`: state, content and browser interaction tests.
 
-1. **Bahçedeki ismin ardındaki insan:** Matematikçi, akademisyen, bilim yöneticisi.
-2. **Nasıl bir üniversite hayal etti?** Kuruluş, dinleme ve düşünce özgürlüğü.
-3. **Kampüsü ağaçlarıyla tanımak:** Bitkiler, peyzaj ve kampüs turları.
-4. **Neden bir bahçe?** Konum, açılış, tasarım ve hatırlamanın anlamı.
+Regenerate the garden story document with `node scripts/render-story.cjs`.
 
-Detaylı anlatım yaklaşık 510 kelime, tahmini dört dakikadır. Tarihsel bilgiler
-kaynaklara dayanır; ziyaretçiye yöneltilen sorular ve bölüm geçişleri özgün anlatımdır.
+## Context-module compatibility
 
-Güncel metinler: [Tosun Hoca’nın hikâyesi](docs/Tosun_Hoca_Hikayesi.html).
-HTML dosyasını indirip tarayıcıda açabilirsiniz. Yeniden üretmek için:
+Reference: [Yağız’s context module](https://github.com/ivorionn/ens525a-context-module),
+reviewed at commit `89cc0231c63369288a3ea6fbccf9fb177de5d9b5`.
 
-```sh
-node scripts/render-story.cjs
-```
+Both projects use Expo SDK 58 and the level identifiers `short | medium | detailed`.
+A future integration can validate incoming levels with `parseContextLevel`. There
+is no live sensor or inter-app connection in this demo. The reference repository
+was not modified.
 
-## Dosyalar
-
-- `App.tsx`: Demo ekranı ve sesli okuma.
-- `src/content.json`: Bölümler, üç seviyedeki metinler ve kaynaklar.
-- `src/StoryFigure.tsx`: Kaynak açıklamalı görsel kartları.
-- `src/model.ts`: Manuel seçim durumu ve seviye doğrulama.
-- `tests/`: Durum, içerik ve tarayıcı etkileşim kontrolleri.
-- `docs/`: Hikâye belgeleri, ekran görüntüleri ve test notları.
-
-## Context modülüyle uyum
-
-Referans: [Yağız’ın context modülü](https://github.com/ivorionn/ens525a-context-module).
-İncelenen commit: `89cc0231c63369288a3ea6fbccf9fb177de5d9b5`.
-
-İki proje de Expo SDK 58 ailesini ve `short | medium | detailed` seviye adlarını
-kullanır. Bizde bunlar Sade / Orta / Detaylı olarak görünür. İleride modülün
-verdiği seviye `parseContextLevel` üzerinden doğrulanabilir. Canlı sensör veya
-uygulamalar arası veri bağlantısı henüz kurulmamıştır. Referans repoda değişiklik
-veya commit yapılmamıştır.
-
-## Doğrulama
+## Validation
 
 ```sh
 npm run typecheck
@@ -93,21 +91,27 @@ npm test
 npm run export
 ```
 
-Tarayıcı testleri için Chrome kurulu olmalı; önce `npm run web`, ardından ayrı
-terminalde `npm run test:ui` çalıştırılmalıdır (varsayılan adres localhost:8081).
+For browser tests, install Chrome, start `npm run web` on port 8081, then run
+`npm run test:ui` in another terminal.
 
-Son kontrolde 5 durum/içerik testi, 4 tarayıcı testi, TypeScript ve ESLint geçti;
-web, Android ve iOS paketleri üretildi. Ses testi kontrollü tarayıcı API taklidi
-kullanır. Fiziksel telefonda Expo Go açılışı ve işitilebilir Türkçe ses ayrıca
-test edilmelidir. Paket üretimi, gerçek cihaz testi değildir.
+The tests cover story selection, the three detail levels, photographs, placeholders,
+reset, source links and narration cancellation. Speech tests use a controlled browser
+API mock, including English-voice selection and the missing-voice message. Physical
+phone playback and Expo Go launch must still be checked on a real device. Successful
+web/Android/iOS exports do not replace device testing.
 
-## Fotoğraflar ve kaynaklar
+## Sources and photographs
 
-Fotoğraflar Sabancı Üniversitesi / gazeteSU kaynaklıdır. Hakları ilgili hak
-sahiplerine aittir; kaynak gösterimi açık lisans iddiası değildir.
+Historical details are based on university biographies and memorial publications.
+Transitions and visitor questions are original narration, not invented quotations.
+Chapter-level references are included in the story document and content data.
 
-- [Bahçe fotoğrafı — Yaşayan Bir Kampüs](https://sabanciuniv.edu/tr/kampus/kampus-ve-sehir/yasayan-bir-kampus)
-- [Kürsü ve kürekli arşiv fotoğrafları — gazeteSU](https://gazetesu.sabanciuniv.edu/tr/bir-guzel-ve-iyi-insani-tosun-terzioglunu-aniyoruz)
-- [Resmi özgeçmiş](https://gazetesu.sabanciuniv.edu/sites/gazetesu.sabanciuniv.edu/files/2013/tosun_terzioglu_ozgecmis.pdf)
+Photographs are credited to Sabancı University / gazeteSU. Rights remain with their
+respective holders; attribution does not imply an open license.
 
-Bölümlere ait ayrıntılı kaynaklar `src/content.json` ve hikâye belgesindedir.
+- [Garden photograph — A Living Campus](https://sabanciuniv.edu/tr/kampus/kampus-ve-sehir/yasayan-bir-kampus)
+- [Archive photographs — gazeteSU](https://gazetesu.sabanciuniv.edu/tr/bir-guzel-ve-iyi-insani-tosun-terzioglunu-aniyoruz)
+- [Official biography](https://gazetesu.sabanciuniv.edu/sites/gazetesu.sabanciuniv.edu/files/2013/tosun_terzioglu_ozgecmis.pdf)
+
+Some original reference pages are in Turkish. Their titles and the demo’s retelling
+are provided in English; the source documents themselves have not been changed.
