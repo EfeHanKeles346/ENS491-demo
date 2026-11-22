@@ -1,0 +1,14 @@
+22 Kasım 2026 — ENS491 demo doğrulaması
+
+TypeScript: geçti.
+ESLint: geçti.
+Node durum/içerik testleri: 4/4 geçti.
+Playwright (Chrome): 4/4 geçti. Mobil 390x844, masaüstü 1440x1000.
+Expo Doctor: 20/20 geçti.
+Expo export: web, Android ve iOS paketleri başarıyla üretildi. Bu işlem cihazda çalışma testi değildir.
+
+Sınanan akışlar: durak dışında → bahçe, üç anlatım, yalnız detaylıda görsel, IC/gölet taslak ekranı, kaynaklar, sıfırlama, olay kaydı, sesin seviye/konum değişiminde kesilmesi, Türkçe ses yokken açıklama.
+
+Ses etkileşim testi kontrollü tarayıcı API taklidi ile yapıldı. Fiziksel iPhone/Android üzerinde Expo Go açılışı, gerçek Türkçe TTS ve ses seviyesi henüz sınanmadı.
+GPS/sensör ölçümü ve otomatik bilişsel yük çıkarımı kapsam dışı; manuel demo.
+Yağız reposunun referans kopyasında git status temiz; commit/push yapılmadı.
